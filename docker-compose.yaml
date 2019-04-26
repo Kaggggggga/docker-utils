@@ -1,0 +1,12 @@
+version: '2.3'
+
+services:
+  utils:
+    image: docker-utils:test
+    build: .
+    environment:
+      AWS_PROFILE: stag
+    entrypoint: tail -f /dev/null
+    volumes:
+    - "~/.aws:/root/.aws"
+    - "~/.kube:/root/.kube"
