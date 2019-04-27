@@ -70,7 +70,6 @@ RUN curl -L $SOPS_URL \
 RUN curl -L $HELM_URL \
         -o helm.tar.gz \
     && tar -xvf helm.tar.gz \
-    && mv $HELM_FOLDER/tiller $BIN_PATH \
     && mv $HELM_FOLDER/helm $BIN_PATH \
     && export HELM_HOME=$HOME/.helm \
     && mkdir -p $HELM_HOME/plugins \
