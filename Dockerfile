@@ -1,4 +1,4 @@
-FROM python:3-stretch
+FROM python:3-slim-stretch
 
 # apt-get
 RUN apt-get update \
@@ -42,10 +42,11 @@ WORKDIR /srv
 COPY build .
 
 # pre commands
-RUN mkdir -p /etc/bash_completion.d/
 
 # apt-get kubectl
-RUN curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg \
+RUN apt-get install -y --no-install-recommends \
+        gnupg \
+    && curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg \
         | apt-key add - \
     && touch /etc/apt/sources.list.d/kubernetes.list \
     && echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" \
@@ -77,14 +78,13 @@ RUN curl -L $HELM_URL \
     && helm init --client-only \
     && rm -rf helm.tar.gz $HELM_FOLDER
 
-# git
-RUN curl -L $GIT_AUTO_COMPLETION_URL \
-    -o /etc/bash_completion.d/git-completion.bash
-
 # post commands
-RUN echo "alias ll=ls -lrt" >> $HOME/.bash_profile \
-    echo "source <(kubectl completion bash)" >> $HOME/.bash_profile \
+RUN echo "alias ll='ls -lrt'" >> $HOME/.bashrc \
+    && echo "source <(kubectl completion bash)" >> $HOME/.bashrc \
+    && apt-get remove --purge -y gnupg \
+    && apt-get autoremove -y \
     && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /tmp/*
 
 ENTRYPOINT ["scripts/entrypoint.sh"]
