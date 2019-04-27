@@ -77,7 +77,8 @@ RUN curl -L $HELM_URL \
     && mkdir -p $HOME/.helm/plugins \
     && helm plugin install $HELM_DIFF_URL --version $HELM_DIFF_VERSION \
     && helm init --client-only \
-    && rm -rf helm.tar.gz $HELM_FOLDER
+    && rm -rf helm.tar.gz $HELM_FOLDER \
+    && helm repo remove stable local
 
 # post commands
 RUN echo "alias ll='ls -lrt'" >> $HOME/.bashrc \
