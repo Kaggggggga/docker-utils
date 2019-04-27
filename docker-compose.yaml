@@ -6,7 +6,8 @@ services:
     build: .
     environment:
       AWS_PROFILE: stag
-    entrypoint: tail -f /dev/null
     volumes:
+    - "~/.gitconfig:/root/.gitconfig"
+    - "~/.bash_history:/root/.bash_history"
     - "~/.aws:/root/.aws"
-    - "~/.kube:/root/.kube"
+    - "~/.ssh:/root/.ssh"

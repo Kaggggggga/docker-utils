@@ -18,7 +18,8 @@ RUN apt-get update \
         unzip \
         socat \
         rsync \
-        net-tools
+        net-tools \
+        ssh
 
 # pip3
 RUN pip3 --no-cache-dir install \
@@ -35,11 +36,13 @@ ARG GIT_AUTO_COMPLETION_URL=https://github.com/git/git/blob/master/contrib/compl
 
 # curl aws-iam-authenticator
 ENV BIN_PATH=/usr/local/bin \
-    EDITOR=vim
+    EDITOR=vim \
+    KUBECONFIG=/root/.kube/kubeconfig.yaml
 
 WORKDIR /srv
 
-COPY build .
+COPY build/scripts scripts
+COPY build/kubeconfig.yaml /root/.kube/
 
 # pre commands
 
@@ -59,7 +62,7 @@ RUN apt-get install -y --no-install-recommends \
 RUN curl -L $HEPTIO_URL \
         -o $BIN_PATH/aws-iam-authenticator \
     && chmod +x $BIN_PATH/aws-iam-authenticator \
-    && ln -s $BIN_PATH/aws-iam-authenticator $BIN_PATH/heptio-iam-authenticator
+    && ln -s $BIN_PATH/aws-iam-authenticator $BIN_PATH/heptio-authenticator-aws
 
 # sops
 RUN curl -L $SOPS_URL \
@@ -71,8 +74,7 @@ RUN curl -L $HELM_URL \
         -o helm.tar.gz \
     && tar -xvf helm.tar.gz \
     && mv $HELM_FOLDER/helm $BIN_PATH \
-    && export HELM_HOME=$HOME/.helm \
-    && mkdir -p $HELM_HOME/plugins \
+    && mkdir -p $HOME/.helm/plugins \
     && helm plugin install $HELM_DIFF_URL --version $HELM_DIFF_VERSION \
     && helm init --client-only \
     && rm -rf helm.tar.gz $HELM_FOLDER
@@ -86,4 +88,4 @@ RUN echo "alias ll='ls -lrt'" >> $HOME/.bashrc \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /tmp/*
 
-ENTRYPOINT ["scripts/entrypoint.sh"]
+ENTRYPOINT ["/srv/scripts/entrypoint.sh"]
