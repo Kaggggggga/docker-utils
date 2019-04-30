@@ -19,7 +19,8 @@ RUN apt-get update \
         socat \
         rsync \
         net-tools \
-        ssh
+        ssh \
+        gnupg
 
 # pip3
 RUN pip3 --no-cache-dir install \
