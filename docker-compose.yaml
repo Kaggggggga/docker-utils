@@ -4,6 +4,7 @@ services:
   utils:
     image: docker-utils:test
     build: .
+    entrypoint: tail -f /dev/null
     environment:
       AWS_PROFILE: stag
     volumes:
@@ -11,3 +12,4 @@ services:
     - "~/.bash_history:/root/.bash_history"
     - "~/.aws:/root/.aws"
     - "~/.ssh:/root/.ssh"
+    - "~/.gnupg:/root/.gnupg"

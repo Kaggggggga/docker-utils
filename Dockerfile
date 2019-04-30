@@ -48,9 +48,7 @@ COPY build/kubeconfig.yaml /root/.kube/
 # pre commands
 
 # apt-get kubectl
-RUN apt-get install -y --no-install-recommends \
-        gnupg \
-    && curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg \
+RUN curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg \
         | apt-key add - \
     && touch /etc/apt/sources.list.d/kubernetes.list \
     && echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" \
@@ -84,7 +82,6 @@ RUN curl -L $HELM_URL \
 # post commands
 RUN echo "alias ll='ls -lrt'" >> $HOME/.bashrc \
     && echo "source <(kubectl completion bash)" >> $HOME/.bashrc \
-    && apt-get remove --purge -y gnupg \
     && apt-get autoremove -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
