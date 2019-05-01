@@ -4,7 +4,7 @@ services:
   utils:
     image: docker-utils:test
     build: .
-    entrypoint: tail -f /dev/null
+    entrypoint: /srv/scripts/tail.sh
     environment:
       AWS_PROFILE: stag
     volumes:
