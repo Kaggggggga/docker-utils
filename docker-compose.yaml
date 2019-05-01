@@ -13,3 +13,4 @@ services:
     - "~/.aws:/root/.aws"
     - "~/.ssh:/root/.ssh"
     - "~/.gnupg:/root/.gnupg"
+    - "/var/run/docker.sock:/var/run/docker.sock:ro"
