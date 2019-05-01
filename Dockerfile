@@ -1,3 +1,5 @@
+FROM docker:18.09 as docker
+
 FROM python:3-slim-stretch
 
 # apt-get
@@ -86,5 +88,7 @@ RUN echo "alias ll='ls -lrt'" >> $HOME/.bashrc \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /tmp/*
+
+COPY --from=docker /usr/local/bin/docker /usr/local/bin/
 
 ENTRYPOINT ["/srv/scripts/entrypoint.sh"]
