@@ -39,13 +39,9 @@ ARG GIT_AUTO_COMPLETION_URL=https://github.com/git/git/blob/master/contrib/compl
 
 # curl aws-iam-authenticator
 ENV BIN_PATH=/usr/local/bin \
+    TMP_PATH=/tmp \
     EDITOR=vim \
     KUBECONFIG=/root/.kube/kubeconfig.yaml
-
-WORKDIR /srv
-
-COPY build/scripts scripts
-COPY build/kubeconfig.yaml /root/.kube/
 
 # pre commands
 
@@ -72,13 +68,13 @@ RUN curl -L $SOPS_URL \
 
 # curl helm
 RUN curl -L $HELM_URL \
-        -o helm.tar.gz \
-    && tar -xvf helm.tar.gz \
-    && mv $HELM_FOLDER/helm $BIN_PATH \
+        -o $TMP_PATH/helm.tar.gz \
+    && tar -xvf $TMP_PATH/helm.tar.gz -C $TMP_PATH $HELM_FOLDER \
+    && mv $TMP_PATH/$HELM_FOLDER/helm $BIN_PATH \
     && mkdir -p $HOME/.helm/plugins \
     && helm plugin install $HELM_DIFF_URL --version $HELM_DIFF_VERSION \
     && helm init --client-only \
-    && rm -rf helm.tar.gz $HELM_FOLDER \
+    && rm -rf $TMP_PATH/helm.tar.gz $TMP_PATH/$HELM_FOLDER \
     && helm repo remove stable local
 
 # post commands
@@ -90,5 +86,7 @@ RUN echo "alias ll='ls -lrt'" >> $HOME/.bashrc \
     && rm -rf /tmp/*
 
 COPY --from=docker /usr/local/bin/docker /usr/local/bin/
-
+WORKDIR /srv
+COPY build/scripts scripts
+COPY build/kubeconfig.yaml /root/.kube/
 ENTRYPOINT ["/srv/scripts/entrypoint.sh"]
