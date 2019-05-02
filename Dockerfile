@@ -1,8 +1,15 @@
+FROM redis:4.0 as redis
+
 FROM docker:18.09 as docker
 
 FROM python:3-slim-stretch
 
 # apt-get
+# - gnupg is for `gpg`
+# - dirmngr is missing when calling gpg
+# - dnsutils is for `dig`
+# - gettext-base is for `envsubst`
+# - net-tools is for `netstat`
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         apt-transport-https \
@@ -22,7 +29,9 @@ RUN apt-get update \
         rsync \
         net-tools \
         ssh \
-        gnupg
+        gnupg \
+        dirmngr \
+        iputils-ping
 
 # pip3
 RUN pip3 --no-cache-dir install \
@@ -77,7 +86,21 @@ RUN curl -L $HELM_URL \
     && rm -rf $TMP_PATH/helm.tar.gz $TMP_PATH/$HELM_FOLDER \
     && helm repo remove stable local
 
-# post commands
+# mongodb client
+RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 9DA31620334BD75D9DCB49F368818C72E52529D4 \
+    && touch /etc/apt/sources.list.d/mongodb-org-4.0.list \
+    && echo "deb http://repo.mongodb.org/apt/debian stretch/mongodb-org/4.0 main" \
+        | tee /etc/apt/sources.list.d/mongodb-org-4.0.list \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
+        mongodb-org-shell \
+        mongodb-org-tools
+
+# mysql/mariadb client
+RUN apt-get install -y --no-install-recommends \
+        mariadb-client
+
+## post commands
 RUN echo "alias ll='ls -lrt'" >> $HOME/.bashrc \
     && echo "source <(kubectl completion bash)" >> $HOME/.bashrc \
     && apt-get autoremove -y \
@@ -85,7 +108,12 @@ RUN echo "alias ll='ls -lrt'" >> $HOME/.bashrc \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /tmp/*
 
+# redis client
+COPY --from=redis /usr/local/bin/redis-cli /usr/local/bin/
+
+# docker client
 COPY --from=docker /usr/local/bin/docker /usr/local/bin/
+
 WORKDIR /srv
 COPY build/scripts scripts
 COPY build/kubeconfig.yaml /root/.kube/
