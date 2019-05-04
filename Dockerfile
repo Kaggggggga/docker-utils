@@ -31,6 +31,7 @@ RUN apt-get update \
         ssh \
         gnupg \
         dirmngr \
+        less \
         iputils-ping
 
 # pip3
@@ -96,9 +97,10 @@ RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 9DA31620334BD75
         mongodb-org-shell \
         mongodb-org-tools
 
-# mysql/mariadb client
+# mysql/mariadb/pgsql client
 RUN apt-get install -y --no-install-recommends \
-        mariadb-client
+        mariadb-client \
+        postgresql-client
 
 ## post commands
 RUN echo "alias ll='ls -lrt'" >> $HOME/.bashrc \
