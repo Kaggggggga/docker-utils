@@ -97,10 +97,9 @@ RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 9DA31620334BD75
         mongodb-org-shell \
         mongodb-org-tools
 
-# mysql/mariadb/pgsql client
+# mysql/mariadb client
 RUN apt-get install -y --no-install-recommends \
-        mariadb-client \
-        postgresql-client
+        mariadb-client
 
 ## post commands
 RUN echo "alias ll='ls -lrt'" >> $HOME/.bashrc \
