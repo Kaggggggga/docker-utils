@@ -32,7 +32,8 @@ RUN apt-get update \
         gnupg \
         dirmngr \
         less \
-        iputils-ping
+        iputils-ping \
+        bash-completion
 
 # pip3
 RUN pip3 --no-cache-dir install \
@@ -103,6 +104,7 @@ RUN apt-get install -y --no-install-recommends \
 
 ## post commands
 RUN echo "alias ll='ls -lrt'" >> $HOME/.bashrc \
+    && echo "source /etc/bash_completion" >> $HOME/.bashrc \
     && echo "source <(kubectl completion bash)" >> $HOME/.bashrc \
     && apt-get autoremove -y \
     && apt-get clean \
